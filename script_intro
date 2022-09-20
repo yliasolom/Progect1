@@ -17,7 +17,7 @@ bzip2 - bunzip2 - see .bz and open it
 project 1:
 
 1.creating a github repository
-I used the ssh-keygen, then created a repository and connected to the computer by copying it by the ssh link 
+(I used the ssh-keygen, then created a repository and connected to the computer by copying it by the ssh link) 
 
 2.create directory for our data SRR_DARA
 
@@ -28,8 +28,13 @@ wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubunt
 tar -vxzf sratoolkit.tar.gz
 export PATH=$PATH:~/home/julia/sratoolkit.3.0.0-ubuntu64/bin
 vdb-config -i
+#or
+conda activate
+conda install -c bioconda sra-tools
 
-4. download rhe data in SRR 
+
+4. download rhe data in SRR:
+wget https://trace.ncbi.nlm.nih.gov/Traces/sra-reads-be/fasta?acc=SRR10971381 #or
 fasterq-dump --split-files SRA_download/SRR10971381  -O SRR_DATA/
 gzip SRR_DATA/*.fastq
 ls SRR_DATA/
@@ -59,24 +64,35 @@ tar -xzf quast-5.2.0.tar.gz
 cd quast-5.2.0
 ./setup.py install
 ../quast-5.2.0/metaquast.py -o reportFastQC -t 16 assembly/scaffolds/fasta
+#or
+conda create -n quast_tool -c conda-forge -c bioconda -c defaults quast
+conda activate quast_tool 
+#to get the result:
+grep ">" spades_scaffolds.fasta | more
+
+#sra-toolkit
+conda create -n samtool 
+conda activate samtools
+samtools faidx spades_scaffolds.fasta #indexing multi-fasta file -> I got the “spades_scaffolds.fasta.fai
+samtools faidx spades_scaffolds.fasta NODE_1_length_29907_cov_150.822528 > contig.fa #suspicious sequence and I separated it
+more spades_scaffolds.fasta.fai  | awk '$2 >= 3000 {print $1}' | xargs samtools faidx spades_scaffolds.fasta > 3000.fa 
 
 #(here we can see reference genomes too (mataquast.log, even in pictures: inversions, translocations, relocations, mismathes)
 
-9. ViralVerify
-install samtools: wget https://github.com/samtools/samtools/releases/download/1.16.1/samtools-1.16.1.tar.bz2
-tar xvf samtools-1.16.1.tar.bz2
-mkdir apps_for_samtools
-./configure --prefix=/home/jilia/apps_for_samtools
-make
-make install
-
-#(If we are interested in all contigs longer than a certain length, there are a thousand ways to do it. For example, >3kbp: 
-more spades_scaffolds.fasta.fai  | awk '$2 >= 3000 {print $1}' | xargs samtools faidx spades_scaffolds.fasta > 3000.fa)
-
 10. BLAST: Basic Local Alignment Search Tool (nih.gov)
+1. Choose Nucleotide BLAST (nucleotide to nucleotide)
+2. Enter or FASTA sequence or we can just enter the sequence in the "field" (Database: Standart database) 
+3. Organism : RNA viruses (taxid:2559587) (as we know covid-19 - RNA-virus)
+4. Entrez Query: 1900/01/01:2020/01/01[PDAT]
+5. Program Selection 
+5.1. Optimize for ->Highly similar sequences (megablast)
 
 
-11.Prokka:
+11.Prokka(rapid bacterial genome annotation):
+conda create -n prokka_tool -c conda-forge -c bioconda -c default prokka
+conda activate prokka_tool
+prokka contig.fa  --kingdom Viruses 
+
 
 12. Getting primers: 
 #Exception error: Multiple templates are currently not supported!
