@@ -30,7 +30,7 @@ export PATH=$PATH:~/home/julia/sratoolkit.3.0.0-ubuntu64/bin
 vdb-config -i
 #or
 conda activate
-conda install -c bioconda sra-tools
+conda install -c daler sratoolkit 
 
 
 4. download rhe data in SRR:
@@ -58,7 +58,7 @@ cd reportFasQC/ -t 12 -o ../SRR_DATA/SRR10971381_*
 here we see statistics (we need the similar length of reads) and so on.
 Our data is in a good quality, as we see on the report and we can proceed our research)
 
-8.QUAST:
+8.QUAST:(QUAST stands for QUality ASsessment Tool)
 wget https://github.com/ablab/quast/releases/download/quast_5.2.0/quast-5.2.0.tar.gz
 tar -xzf quast-5.2.0.tar.gz
 cd quast-5.2.0
@@ -67,10 +67,11 @@ cd quast-5.2.0
 #or
 conda create -n quast_tool -c conda-forge -c bioconda -c defaults quast
 conda activate quast_tool 
+
 #to get the result:
 grep ">" spades_scaffolds.fasta | more
 
-#sra-toolkit
+#samtools
 conda create -n samtool 
 conda activate samtools
 samtools faidx spades_scaffolds.fasta #indexing multi-fasta file -> I got the “spades_scaffolds.fasta.fai
